@@ -1,0 +1,25 @@
+{
+  "name": "Pa Gerry's Grill",
+  "short_name": "PaGerry",
+  "description": "Authentic Nigerian cuisine delivered to your doorstep",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F97316",
+  "theme_color": "#F97316",
+  "icons": [
+    {
+      "src": "https://bookwithrimrockhotel.com/wp-content/uploads/2024/03/Egusi-3.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://bookwithrimrockhotel.com/wp-content/uploads/2024/03/Egusi-3.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ],
+  "categories": ["food", "restaurant", "delivery"],
+  "lang": "en",
+  "orientation": "portrait-primary",
+  "scope": "/"
+}

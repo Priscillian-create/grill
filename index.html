@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#F97316" />
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  
+  <!-- Apple Touch Icon -->
+  <link rel="apple-touch-icon" href="https://bookwithrimrockhotel.com/wp-content/uploads/2024/03/Egusi-3.jpg" />
+  
+  <title>Pa Gerry's Grill</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      background-color: #f8f9fa;
+    }
+    
+    /* Custom animations */
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    /* Loading skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+    
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Toast notification styles */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background-color: #333;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    /* Fix for iOS input zoom */
+    input, textarea, select {
+      font-size: 16px !important;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #F97316;
+      border-radius: 3px;
+    }
+    
+    /* Floating action button */
+    .fab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: #F97316;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+      z-index: 40;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+    
+    /* Card hover effect */
+    .dish-card {
+      transition: all 0.3s ease;
+    }
+    
+    .dish-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    /* Back to top button */
+    .back-to-top {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #333;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 40;
+      cursor: pointer;
+    }
+    
+    .back-to-top.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .back-to-top:hover {
+      background-color: #555;
+    }
+    
+    /* Category pill active state */
+    .category-pill {
+      transition: all 0.2s ease;
+    }
+    
+    .category-pill.active {
+      background-color: #F97316;
+      color: white;
+    }
+    
+    /* Cart item animation */
+    @keyframes cartBounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+    
+    .cart-bounce {
+      animation: cartBounce 0.3s ease;
+    }
+    
+    /* 24 Hours Badge */
+    .hours-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #10B981;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 10;
+    }
+    
+    /* Install button styles */
+    .install-button {
+      position: fixed;
+      bottom: 20px;
+      right: 90px;
+      background-color: #4F46E5;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .install-button:hover {
+      background-color: #4338CA;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* PWA Install Banner */
+    .pwa-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #4F46E5;
+      color: white;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+    
+    .pwa-banner.show {
+      transform: translateY(0);
+    }
+    
+    .pwa-banner button {
+      background-color: white;
+      color: #4F46E5;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .pwa-banner button:hover {
+      background-color: #f3f4f6;
+    }
+    
+    .pwa-banner .dismiss {
+      background: none;
+      color: white;
+      margin-left: 16px;
+      padding: 8px;
+      cursor: pointer;
+    }
+    
+    /* Responsive adjustments for dish images */
+    @media (max-width: 639px) {
+      .dish-card img {
+        height: 180px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <!-- Loading indicator -->
+  <div id="loading-indicator" class="fixed inset-0 bg-white bg-opacity-90 z-50 flex items-center justify-center">
+    <div class="text-center">
+      <div class="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <p class="mt-4 text-gray-700 font-medium">Loading delicious meals...</p>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast"></div>
+  
+  <!-- Audio for cart sound -->
+  <audio id="cart-sound" preload="none"></audio>
+
+  <!-- PWA Install Banner -->
+  <div id="pwa-banner" class="pwa-banner">
+    <div>
+      <strong>Install Pa Gerry's Grill</strong>
+      <p>Get our app on your home screen for quick access</p>
+    </div>
+    <div>
+      <button id="pwa-install-button">Install</button>
+      <button id="pwa-dismiss-button" class="dismiss">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-40 bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 flex justify-between h-16 items-center">
+      <div class="flex items-center">
+        <button id="menu-toggle" class="md:hidden mr-3 text-gray-700">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+        <div class="text-2xl font-bold text-orange-500">Pa Gerry's Grill</div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button id="search-toggle" class="text-gray-700">
+          <i class="fas fa-search"></i>
+        </button>
+        <button onclick="toggleCart()" class="relative text-gray-700">
+          <i class="fas fa-shopping-cart text-xl"></i>
+          <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">0</span>
+        </button>
+        <button id="install-inline-btn" class="px-3 py-1 bg-orange-500 hover:bg-orange-600 text-white rounded-md text-sm">Install</button>
+      </div>
+    </div>
+    
+    <!-- Search bar (hidden by default) -->
+    <div id="search-bar" class="hidden px-4 pb-3 bg-white">
+      <div class="relative">
+        <input type="text" id="search-input" placeholder="Search for dishes..." 
+               class="w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500">
+        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Side menu for mobile -->
+  <div id="side-menu" class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out">
+    <div class="p-5 border-b">
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-bold text-orange-500">Menu</h2>
+        <button id="close-menu" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+    </div>
+    <div class="p-4">
+      <a href="#menu" class="block py-2 text-gray-700 hover:text-orange-500">
+        <i class="fas fa-utensils mr-2"></i> Our Menu
+      </a>
+      <a href="#contact" class="block py-2 text-gray-700 hover:text-orange-500">
+        <i class="fas fa-phone mr-2"></i> Contact
+      </a>
+      <a href="#about" class="block py-2 text-gray-700 hover:text-orange-500">
+        <i class="fas fa-info-circle mr-2"></i> About Us
+      </a>
+      <a href="tel:+2347037850121" class="block py-2 text-gray-700 hover:text-orange-500">
+        <i class="fas fa-phone-alt mr-2"></i> Call Now
+      </a>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <section class="relative h-[60vh] bg-cover bg-center flex items-center justify-center text-white text-center" style="background-image: url('https://cdn.punchng.com/wp-content/uploads/2023/12/19151305/Christmas-dishes.jpg')">
+    <div class="hours-badge">Open 24 Hours</div>
+    <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+    <div class="relative z-10 px-6 max-w-3xl">
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Welcome to Pa Gerry's Grill</h1>
+      <p class="text-lg md:text-xl mb-6">Taste the Authentic Nigerian Flavor</p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="https://wa.me/2347037850121?text=Hi%20Pa%20Gerry's%20Grill%2C%20I'd%20like%20to%20place%20an%20order!" 
+           class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-full text-lg font-medium transition-colors">
+          <i class="fab fa-whatsapp mr-2"></i> Order on WhatsApp
+        </a>
+        <a href="tel:+2347037850121" 
+           class="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full text-lg font-medium transition-colors">
+          <i class="fas fa-phone mr-2"></i> Call Us
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dishes -->
+  <section class="py-12 bg-white" id="menu">
+    <div class="max-w-7xl mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center mb-4">Our Menu</h2>
+      <p class="text-gray-600 text-center mb-10 max-w-2xl mx-auto">Explore our delicious selection of authentic Nigerian dishes made with fresh ingredients</p>
+      
+      <!-- Category filters -->
+      <div class="flex flex-wrap justify-center gap-2 mb-8">
+        <button onclick="filterDishes('all')" class="category-filter category-pill active px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium">All</button>
+        <button onclick="filterDishes('rice')" class="category-filter category-pill px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium">Rice Dishes</button>
+        <button onclick="filterDishes('spaghetti')" class="category-filter category-pill px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium">Spaghetti</button>
+        <button onclick="filterDishes('soup')" class="category-filter category-pill px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium">Soups</button>
+        <button onclick="filterDishes('swallow')" class="category-filter category-pill px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium">Swallows</button>
+        <button onclick="filterDishes('meat')" class="category-filter category-pill px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium">Meat & Protein</button>
+        <button onclick="filterDishes('peppersoup')" class="category-filter category-pill px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium">Pepper Soup</button>
+        <button onclick="filterDishes('sides')" class="category-filter category-pill px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium">Sides</button>
+      </div>
+      
+      <!-- Dish container - Updated to show 2 items per line on mobile -->
+      <div id="dish-container" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <!-- Skeleton loading cards -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div class="skeleton h-48 w-full"></div>
+          <div class="p-5">
+            <div class="skeleton h-6 w-3/4 mb-2 rounded"></div>
+            <div class="skeleton h-4 w-1/2 mb-4 rounded"></div>
+            <div class="skeleton h-10 w-full rounded"></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div class="skeleton h-48 w-full"></div>
+          <div class="p-5">
+            <div class="skeleton h-6 w-3/4 mb-2 rounded"></div>
+            <div class="skeleton h-4 w-1/2 mb-4 rounded"></div>
+            <div class="skeleton h-10 w-full rounded"></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div class="skeleton h-48 w-full"></div>
+          <div class="p-5">
+            <div class="skeleton h-6 w-3/4 mb-2 rounded"></div>
+            <div class="skeleton h-4 w-1/2 mb-4 rounded"></div>
+            <div class="skeleton h-10 w-full rounded"></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div class="skeleton h-48 w-full"></div>
+          <div class="p-5">
+            <div class="skeleton h-6 w-3/4 mb-2 rounded"></div>
+            <div class="skeleton h-4 w-1/2 mb-4 rounded"></div>
+            <div class="skeleton h-10 w-full rounded"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Cart Summary -->
+      <div class="flex flex-col sm:flex-row justify-center gap-4 mt-10">
+        <button onclick="payWithPaystack()" class="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+          <i class="fas fa-credit-card mr-2"></i> Pay with Paystack
+        </button>
+        <a id="whatsapp-link" href="#" target="_blank" class="bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+          <i class="fab fa-whatsapp mr-2"></i> Checkout via WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-12 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4">
+      <h2 class="text-3xl font-bold text-center mb-8">Contact Us</h2>
+      <div class="bg-white rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h3 class="text-xl font-semibold mb-4">Get in Touch</h3>
+            <p class="mb-4 text-gray-600">Have questions or special requests? We'd love to hear from you!</p>
+            <div class="space-y-3">
+              <div class="flex items-center">
+                <i class="fas fa-map-marker-alt text-orange-500 w-6"></i>
+                <span class="ml-3">Ibeju-Lekki, Lagos State, Nigeria</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-phone text-orange-500 w-6"></i>
+                <span class="ml-3">+234 703 785 0121</span>
+              </div>
+              <div class="flex items-center">
+                <i class="fas fa-envelope text-orange-500 w-6"></i>
+                <span class="ml-3">Pagerrysgrill@gmail.com</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold mb-4">Opening Hours</h3>
+            <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-clock text-green-600 mr-2"></i>
+                <span class="font-semibold text-green-700">Open 24 Hours</span>
+              </div>
+              <p class="text-green-600">We're available round the clock to serve you delicious Nigerian meals!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section (moved to the end) -->
+  <section id="about" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl font-bold mb-4">About Pa Gerry's Grill</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          We bring you the authentic taste of Nigerian cuisine, prepared with love and the finest ingredients. 
+          Our dishes are crafted to delight your taste buds and give you a memorable dining experience.
+        </p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div class="text-center p-6 bg-orange-50 rounded-xl">
+          <div class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-utensils text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Authentic Recipes</h3>
+          <p class="text-gray-600">Traditional Nigerian recipes passed down through generations.</p>
+        </div>
+        <div class="text-center p-6 bg-orange-50 rounded-xl">
+          <div class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-leaf text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Fresh Ingredients</h3>
+          <p class="text-gray-600">Only the freshest and highest quality ingredients in our dishes.</p>
+        </div>
+        <div class="text-center p-6 bg-orange-50 rounded-xl">
+          <div class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-truck text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Quick Delivery</h3>
+          <p class="text-gray-600">Fast and reliable delivery service to enjoy our meals anywhere.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-12 mt-10">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4">Pa Gerry's Grill</h3>
+          <p class="text-gray-400">Taste the Authentic Nigerian Flavor</p>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+          <ul class="space-y-2">
+            <li><a href="#menu" class="text-gray-400 hover:text-orange-300">Menu</a></li>
+            <li><a href="#contact" class="text-gray-400 hover:text-orange-300">Contact</a></li>
+            <li><a href="#about" class="text-gray-400 hover:text-orange-300">About Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold mb-4">Follow Us</h3>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-orange-300"><i class="fab fa-facebook-f text-xl"></i></a>
+            <a href="#" class="text-gray-400 hover:text-orange-300"><i class="fab fa-instagram text-xl"></i></a>
+            <a href="#" class="text-gray-400 hover:text-orange-300"><i class="fab fa-twitter text-xl"></i></a>
+            <a href="https://wa.me/2347037850121" class="text-gray-400 hover:text-orange-300"><i class="fab fa-whatsapp text-xl"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+        <p>Ibeju-Lekki, Lagos State, Nigeria</p>
+        <p class="mt-2">© 2025 Pa Gerry's Grill. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Action Button -->
+  <div class="fab" onclick="toggleCart()">
+    <i class="fas fa-shopping-cart text-xl"></i>
+    <span id="fab-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">0</span>
+  </div>
+
+  <!-- Back to Top Button -->
+  <div class="back-to-top" id="back-to-top">
+    <i class="fas fa-arrow-up"></i>
+  </div>
+
+  <!-- Cart Modal -->
+  <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50 p-4">
+    <div class="bg-white rounded-xl w-full max-w-md shadow-xl relative max-h-[95vh] overflow-y-auto flex flex-col">
+      <div class="p-6 border-b">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-semibold">Your Cart</h2>
+          <button onclick="toggleCart()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6">
+        <div class="text-sm font-semibold mb-2">Cart Items</div>
+        <div id="cart-items" class="space-y-4 max-h-[40vh] overflow-y-auto pr-2">
+          <p class="text-gray-500 text-center py-8">Your cart is empty</p>
+        </div>
+      </div>
+      
+      <div class="p-6 border-t">
+        <div class="flex justify-between items-center mb-4">
+          <span class="font-semibold">Total:</span>
+          <span class="font-bold text-lg">₦<span id="cart-total">0</span></span>
+        </div>
+        <div class="mb-4">
+          <div class="font-semibold mb-2">Delivery Details</div>
+          <div class="space-y-3">
+            <input id="cust-name" type="text" class="w-full px-3 py-2 border rounded-lg" placeholder="Full Name" />
+            <input id="cust-phone" type="tel" class="w-full px-3 py-2 border rounded-lg" placeholder="Phone Number" />
+            <input id="cust-email" type="email" class="w-full px-3 py-2 border rounded-lg" placeholder="Email Address" />
+            <textarea id="cust-address" class="w-full px-3 py-2 border rounded-lg" placeholder="House Address"></textarea>
+            <input id="cust-city" type="text" class="w-full px-3 py-2 border rounded-lg" placeholder="City/Area" />
+            <input id="cust-landmark" type="text" class="w-full px-3 py-2 border rounded-lg" placeholder="Nearest Landmark (optional)" />
+            <textarea id="cust-notes" class="w-full px-3 py-2 border rounded-lg" placeholder="Delivery Notes (optional)"></textarea>
+          </div>
+        </div>
+        
+        <div class="flex flex-col gap-3">
+          <button onclick="continueAfterDetails()" class="bg-gray-800 text-white py-3 px-6 rounded-lg hover:bg-black transition-colors flex items-center justify-center">
+            Continue to Payment
+          </button>
+          <button onclick="payWithPaystack()" class="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+            <i class="fas fa-credit-card mr-2"></i> Pay Now
+          </button>
+          
+          <a id="whatsapp-link-modal" href="#" target="_blank" class="bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+            <i class="fab fa-whatsapp mr-2"></i> Order on WhatsApp
+          </a>
+          
+          <button onclick="clearCart()" class="bg-gray-200 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors">
+            Clear Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', function() {
+      // Hide loading indicator after a short delay
+      setTimeout(() => {
+        document.getElementById('loading-indicator').style.display = 'none';
+      }, 1000);
+      
+      // Render dishes
+      renderDishes();
+      
+      // Setup event listeners
+      setupEventListeners();
+      
+      // Setup back to top button
+      setupBackToTop();
+      
+      // Register service worker for PWA
+      registerServiceWorker();
+      
+      // Setup PWA install button
+      setupInstallButton();
+      setTimeout(() => {
+        showToast("Install Pa Gerry's Grill for quick access");
+      }, 2000);
+      
+      // Check if app is running in standalone mode (PWA)
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('App is running in standalone mode');
+      }
+    });
+    
+    // Dishes data with categories
+    const dishes = [
+      // Rice Dishes
+      { 
+        name: "Fried Rice with Chicken", 
+        price: 2500, 
+        image: "https://nigerianfoodiehub.com/wp-content/uploads/sb-instagram-feed-images/243573159_1991304487707287_4762196734205924049_nfull.jpg",
+        category: "rice"
+      },
+      { 
+        name: "Fried Rice with One Beef", 
+        price: 1500, 
+        image: "https://i.ytimg.com/vi/AVFr2MhQLis/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBzRKnq8LUs-kyf3DrfUc7sTWGbCA",
+        category: "rice"
+      },
+      { 
+        name: "Jollof Rice with Chicken", 
+        price: 2500, 
+        image: "https://cdn.guardian.ng/wp-content/uploads/2023/12/Photo-Credit-Jollof-Festival-.jpg",
+        category: "rice"
+      },
+      {
+        name: "Rice and Stew with One Beef",
+        price: 1500,
+        image: "https://tosenat3arena.com/wp-content/uploads/2022/11/139529.jpg",
+        category: "rice"
+      },
+      {
+        name: "Jollof Rice with One Beef",
+        price: 1500,
+        image: "https://kikifoodies.com/wp-content/uploads/2025/03/ET5B8958-4-1024x1024.jpeg",
+        category: "rice"
+      },
+      {
+        name: "Banga Stew with Rice",
+        price: 1500,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzbcjn8QCaJQlFwjDI54e-ay_kzhWqi3Zg7w&s",
+        category: "rice"
+      },
+      {
+        name: "Coconut Rice with One Beef",
+        price: 1500,
+        image: "https://gtfoodsplus.com/wp-content/uploads/2024/08/DSC0394coconut-fried-rice-.jpg",
+        category: "rice"
+      },
+      {
+        name: "Ofada Rice and Sauce",
+        price: 2000,
+        image: "https://yummieliciouz.com/wp-content/uploads/2023/10/fluffy-ofada-rice-jpg.webp",
+        category: "rice"
+      },
+      {
+        name: "Jollof Spaghetti with One Beef",
+        price: 1500,
+        image: "https://joyfulcook.com/wp-content/uploads/2025/02/WhatsApp-Image-2025-02-08-at-08.07.26_34ce0cdb-e1739000408373.jpg",
+        category: "spaghetti"
+      },
+      
+      // Soups
+      {
+        name: "Egusi Soup with Fufu, Garri or Semo",
+        price: 1500,
+        image: "https://bookwithrimrockhotel.com/wp-content/uploads/2024/03/Egusi-3.jpg",
+        category: "soup"
+      },
+      {
+        name: "Vegetable Soup with Fufu, Garri or Semo",
+        price: 1500,
+        image: "https://glicengreenkitchen.wordpress.com/wp-content/uploads/2020/05/images-31.jpeg?w=554",
+        category: "soup"
+      },
+      {
+        name: "Oha Soup",
+        price: 1500,
+        image: "https://gtfoodsplus.com/wp-content/uploads/2024/08/images-2.jpg",
+        category: "soup"
+      },
+      {
+        name: "Afang Soup",
+        price: 1500,
+        image: "https://foods.africanmarketdubai.com/wp-content/uploads/2024/10/afang-soup.jpeg",
+        category: "soup"
+      },
+      {
+        name: "Ogbono Soup",
+        price: 1500,
+        image: "https://foods.africanmarketdubai.com/wp-content/uploads/2024/10/Ogbono-soup.jpeg",
+        category: "soup"
+      },
+      // Bucket Soups & Stew
+      {
+        name: "Bucket of Egusi Soup",
+        price: 10000,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgbED-Ap8dCY3Znqv9Clb6p3zkTMlFTkdbGg&s",
+        category: "soup"
+      },
+      {
+        name: "Bucket of Vegetable Soup",
+        price: 10000,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWekA2UMlQYbL6Dju_XXK_zfwi9EDkn1cn9g&s",
+        category: "soup"
+      },
+      {
+        name: "Bucket of Oha Soup",
+        price: 10000,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcr67HdSQiVN2ZtEfFm-8DqHpjVYa0Qpaf3w&s",
+        category: "soup"
+      },
+      {
+        name: "Bucket of Ogbono Soup",
+        price: 10000,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5jHCrDpOkKL2Kwb8KmfL3iIGlqajBp6zrBA&s",
+        category: "soup"
+      },
+      
+      {
+        name: "Bucket of Bitterleaf Soup",
+        price: 10000,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8P4bWmKzoaVbCw5VQpIUlduRtR62wujfEBA&s",
+        category: "soup"
+      },
+      {
+        name: "Bucket of Stew",
+        price: 10000,
+        image: "https://files.selar.co/product-images/2023/products/FoodDeliveryLagos/red-stew-2-litres-online--selar.co-64dd2b5563b5a.jpg",
+        category: "soup"
+      },
+      
+      // Swallows
+      {
+        name: "Pounded Yam",
+        price: 200,
+        image: "https://gtfoodsplus.com/wp-content/uploads/2024/08/images-1.jpg",
+        category: "swallow"
+      },
+      {
+        name: "Eba (Garri)",
+        price: 200,
+        image: "https://admin.9jakitchen.com/storage/foods/1710520770.jpg",
+        category: "swallow"
+      },
+      {
+        name: "Semo",
+        price: 200,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHv6JAbqBMxjXjYGE1PFhZgvUqgxPAklD7n5dMZLzL6UDe9KG8TjqbbmswexEG4ywW54s&usqp=CAU",
+        category: "swallow"
+      },
+      {
+        name: "Fufu",
+        price: 200,
+        image: "https://2teesfoods.co.uk/wp-content/uploads/2023/11/img_8013.jpeg",
+        category: "swallow"
+      },
+      {
+        name: "Amala",
+        price: 200,
+        image: "https://mandifoods.com.ng/wp-content/uploads/2022/11/Amala.jpg",
+        category: "swallow"
+      },
+      
+      // Meat & Protein
+      {
+        name: "Peppered Meat (per 5 pieces)",
+        price: 1000,
+        image: "https://i.ytimg.com/vi/2vjFqDptFUU/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLB4VvPexH1G0nfHYo-OWpLigHdE-g",
+        category: "meat"
+      },
+      {
+        name: "Peppered Pormo (per 5 pieces)",
+        price: 1000,
+        image: "https://i.ytimg.com/vi/gs7_2e75Duw/sddefault.jpg",
+        category: "meat"
+      },
+      {
+        name: "Peppered Chicken",
+        price: 1000,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBMvst5nLyJMlcyvWkL7jAgQshirvfynEAd___d9wYfwi-VBDfPlzNTSVUhe66tkdGIKk&usqp=CAU",
+        category: "meat"
+      },
+      {
+        name: "Peppered Turkey",
+        price: 2000,
+        image: "https://thecravebowl.com/wp-content/uploads/2025/01/71d766a51418e78a2d2cd9cfc4895417.jpg",
+        category: "meat"
+      },
+      {
+        name: "Grilled Chicken",
+        price: 1500,
+        image: "https://i.pinimg.com/474x/28/72/b7/2872b7fccab3a54f5f68dad86d3efa70.jpg",
+        category: "meat"
+      },
+      {
+        name: "Asun (Spicy Goat Meat, per 4 pieces)",
+        price: 2000,
+        image: "https://assets.ekotoken.ng/wp-content/uploads/sites/5/2022/11/04094423/asun-600x600-1.jpg",
+        category: "meat"
+      },
+      {
+        name: "Suya (Spicy Skewered Meat)",
+        price: 2500,
+        image: "https://9jacuisine.co.uk/wp-content/uploads/2021/10/Suya-meat.jpg",
+        category: "meat"
+      },
+      {
+        name: "Barbecue Fish",
+        price: 5000,
+        image: "https://i.ytimg.com/vi/IqIfIRsdQmY/maxresdefault.jpg",
+        category: "meat"
+      },
+      
+      // Pepper Soup
+      {
+        name: "Catfish Peppersoup",
+        price: 2500,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcvEY1qOAP28ooK6mRmRkxat6hxD8BYyU4hQ&s",
+        category: "peppersoup"
+      },
+      {
+        name: "Goatmeat Peppersoup",
+        price: 2000,
+        image: "https://ivyleaguerestaurants.com/wp-content/uploads/2022/05/Goat-Meat-Pepper-Soup.jpg",
+        category: "peppersoup"
+      },
+      {
+        name: "Chicken Peppersoup",
+        price: 3000,
+        image: "https://i.ytimg.com/vi/kZUD33Z_HQg/maxresdefault.jpg",
+        category: "peppersoup"
+      },
+      {
+        name: "Nkwobi",
+        price: 2500,
+        image: "https://i.ytimg.com/vi/wnJvkKeNdUY/maxresdefault.jpg",
+        category: "peppersoup"
+      },
+      
+      // Sides
+      {
+        name: "Fried Plantain",
+        price: 800,
+        image: "https://www.thepretendchef.com/wp-content/uploads/2017/11/Fried-plantains-recipe-1-15.jpg.webp",
+        category: "sides"
+      },
+      {
+        name: "Moi Moi",
+        price: 600,
+        image: "https://www.myactivekitchen.com/wp-content/uploads/2015/05/nigerian-moi-moi-recipe-image-9.jpg",
+        category: "sides"
+      },
+      {
+        name: "Akara (5 for 500)",
+        price: 500,
+        image: "https://upload.wikimedia.org/wikipedia/commons/b/bb/Beans_Ball-Akara.jpg",
+        category: "sides"
+      },
+      {
+        name: "Salad",
+        price: 800,
+        image: "https://loluscuisine.com/wp-content/uploads/2022/12/Coleslaw1.jpg",
+        category: "sides"
+      }
+    ];
+    
+    // Cart state
+    let cart = [];
+    let currentFilter = 'all';
+    
+    // DOM elements
+    const cartCount = document.getElementById('cart-count');
+    const fabCount = document.getElementById('fab-count');
+    const dishContainer = document.getElementById('dish-container');
+    const cartItems = document.getElementById('cart-items');
+    const cartTotal = document.getElementById('cart-total');
+    const whatsappLink = document.getElementById('whatsapp-link');
+    const whatsappLinkModal = document.getElementById('whatsapp-link-modal');
+    const toast = document.getElementById('toast');
+    
+    // Setup event listeners
+    function setupEventListeners() {
+      // Menu toggle
+      document.getElementById('menu-toggle').addEventListener('click', function() {
+        document.getElementById('side-menu').classList.toggle('-translate-x-full');
+      });
+      
+      // Close menu
+      document.getElementById('close-menu').addEventListener('click', function() {
+        document.getElementById('side-menu').classList.add('-translate-x-full');
+      });
+      
+      // Search toggle
+      document.getElementById('search-toggle').addEventListener('click', function() {
+        const searchBar = document.getElementById('search-bar');
+        searchBar.classList.toggle('hidden');
+        if (!searchBar.classList.contains('hidden')) {
+          document.getElementById('search-input').focus();
+        }
+      });
+      
+      // Search functionality
+      document.getElementById('search-input').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        filterDishes(currentFilter, searchTerm);
+      });
+      
+      // Close side menu when clicking outside
+      document.addEventListener('click', function(e) {
+        const sideMenu = document.getElementById('side-menu');
+        const menuToggle = document.getElementById('menu-toggle');
+        
+        if (!sideMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+          sideMenu.classList.add('-translate-x-full');
+        }
+      });
+      
+      // Close cart modal when clicking outside
+      document.getElementById('cart-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          toggleCart();
+        }
+      });
+    }
+    
+    // Setup back to top button
+    function setupBackToTop() {
+      const backToTopButton = document.getElementById('back-to-top');
+      
+      window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+          backToTopButton.classList.add('show');
+        } else {
+          backToTopButton.classList.remove('show');
+        }
+      });
+      
+      backToTopButton.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+    
+    // Register service worker
+    function registerServiceWorker() {
+      if ('serviceWorker' in navigator && !location.hostname.includes('stackblitz')) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            })
+            .catch(error => {
+              console.log('ServiceWorker registration skipped or failed: ', error);
+            });
+        });
+      }
+    }
+    
+    // Setup PWA install button
+    function setupInstallButton() {
+      let deferredPrompt;
+      const pwaBanner = document.getElementById('pwa-banner');
+      const pwaInstallButton = document.getElementById('pwa-install-button');
+      const pwaDismissButton = document.getElementById('pwa-dismiss-button');
+      const inlineBtn = document.getElementById('install-inline-btn');
+      
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        window.deferredPrompt = e;
+        pwaBanner.classList.add('show');
+      });
+      
+      pwaInstallButton.addEventListener('click', () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(() => {
+            deferredPrompt = null;
+            window.deferredPrompt = null;
+          });
+        }
+        pwaBanner.classList.remove('show');
+      });
+      
+      pwaDismissButton.addEventListener('click', () => {
+        // Hide the banner
+        pwaBanner.classList.remove('show');
+      });
+      
+      // Handle app installed event
+      window.addEventListener('appinstalled', () => {
+        console.log('PWA was installed');
+        // Hide the banner if it exists
+        pwaBanner.classList.remove('show');
+      });
+    }
+    
+    // Render dishes
+    function renderDishes(dishesToRender = dishes) {
+      dishContainer.innerHTML = '';
+      
+      if (dishesToRender.length === 0) {
+        dishContainer.innerHTML = `
+          <div class="col-span-full text-center py-10">
+            <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500">No dishes found matching your criteria.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      dishesToRender.forEach((dish, index) => {
+        const originalIndex = dishes.findIndex(d => d.name === dish.name);
+        const div = document.createElement('div');
+        div.className = "bg-white rounded-xl shadow-md overflow-hidden dish-card";
+        div.style.animationDelay = `${index * 0.05}s`;
+        
+        div.innerHTML = `
+          <div class="relative">
+            <img src="${dish.image}" alt="${dish.name}" class="w-full h-40 object-cover">
+            <div class="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+              ${dish.category.charAt(0).toUpperCase() + dish.category.slice(1)}
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="text-sm font-semibold mb-2">${dish.name}</h3>
+            <p class="text-green-600 font-bold mb-3">₦${dish.price.toLocaleString()}</p>
+            <button onclick="addToCart(${originalIndex})" class="w-full py-2 mb-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition flex items-center justify-center text-sm">
+              <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+            </button>
+            <a href="https://wa.me/2347037850121?text=I want to order ${encodeURIComponent(dish.name)} for ₦${dish.price}" target="_blank">
+              <button class="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center text-sm">
+                <i class="fab fa-whatsapp mr-2"></i> Order on WhatsApp
+              </button>
+            </a>
+          </div>
+        `;
+        
+        dishContainer.appendChild(div);
+      });
+    }
+    
+    // Filter dishes by category
+    function filterDishes(category, searchTerm = '') {
+      currentFilter = category;
+      
+      // Update filter buttons
+      document.querySelectorAll('.category-filter').forEach(btn => {
+        if (btn.textContent.toLowerCase() === category || 
+            (category === 'all' && btn.textContent === 'All')) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      
+      let filteredDishes = dishes;
+      
+      // Filter by category
+      if (category !== 'all') {
+        filteredDishes = dishes.filter(dish => dish.category === category);
+      }
+      
+      // Filter by search term
+      if (searchTerm) {
+        filteredDishes = filteredDishes.filter(dish => 
+          dish.name.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      renderDishes(filteredDishes);
+    }
+    
+    // Add item to cart
+    function addToCart(index) {
+      const dish = dishes[index];
+      cart.push(dish);
+      
+      // Play sound via Web Audio API
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioCtx();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = 880;
+        o.connect(g);
+        g.connect(ctx.destination);
+        g.gain.setValueAtTime(0.0001, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+        o.start();
+        o.stop(ctx.currentTime + 0.15);
+      } catch (e) {}
+      
+      // Update cart
+      updateCart();
+      
+      // Animate cart icon
+      const cartIcon = document.getElementById('cart-count').parentElement;
+      cartIcon.classList.add('cart-bounce');
+      setTimeout(() => cartIcon.classList.remove('cart-bounce'), 300);
+      
+      // Show toast notification
+      showToast(`${dish.name} added to cart!`);
+    }
+    
+    // Update cart
+    function updateCart() {
+      // Update cart count
+      const count = cart.length;
+      cartCount.textContent = count;
+      fabCount.textContent = count;
+      
+      // Update cart items
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<p class="text-gray-500 text-center py-8">Your cart is empty</p>';
+      } else {
+        cartItems.innerHTML = '';
+        
+        // Group items by name and count
+        const itemCounts = {};
+        cart.forEach(item => {
+          if (itemCounts[item.name]) {
+            itemCounts[item.name].count++;
+          } else {
+            itemCounts[item.name] = {
+              ...item,
+              count: 1
+            };
+          }
+        });
+        
+        // Render grouped items
+        Object.values(itemCounts).forEach(item => {
+          const div = document.createElement('div');
+          div.className = "flex justify-between items-center border-b pb-3";
+          
+          div.innerHTML = `
+            <div>
+              <span class="font-medium">${item.name}</span>
+              <span class="text-gray-500 text-sm ml-2">x${item.count}</span>
+            </div>
+            <div class="flex items-center">
+              <span class="font-medium">₦${(item.price * item.count).toLocaleString()}</span>
+              <button onclick="removeFromCart('${item.name}')" class="ml-2 text-red-500 hover:text-red-700">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          `;
+          
+          cartItems.appendChild(div);
+        });
+      }
+      
+      // Calculate total
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      cartTotal.textContent = total.toLocaleString();
+      
+      // Update WhatsApp links
+      const name = document.getElementById('cust-name')?.value?.trim() || '';
+      const phone = document.getElementById('cust-phone')?.value?.trim() || '';
+      const email = document.getElementById('cust-email')?.value?.trim() || '';
+      const address = document.getElementById('cust-address')?.value?.trim() || '';
+      const city = document.getElementById('cust-city')?.value?.trim() || '';
+      const landmark = document.getElementById('cust-landmark')?.value?.trim() || '';
+      const notes = document.getElementById('cust-notes')?.value?.trim() || '';
+      const details = [
+        address ? `Address: ${address}` : '',
+        city ? `City: ${city}` : '',
+        landmark ? `Landmark: ${landmark}` : '',
+        name ? `Name: ${name}` : '',
+        phone ? `Phone: ${phone}` : '',
+        email ? `Email: ${email}` : '',
+        notes ? `Notes: ${notes}` : ''
+      ].filter(Boolean).join('; ');
+      const orderText = cart.length > 0 
+        ? `Hi Pa Gerry's Grill, I'd like to order: ${cart.map(i => i.name).join(', ')}. Total: ₦${total.toLocaleString()}${details ? ' | ' + details : ''}`
+        : `Hi Pa Gerry's Grill, I'd like to place an order!${details ? ' | ' + details : ''}`;
+      
+      const encodedText = encodeURIComponent(orderText);
+      whatsappLink.href = `https://wa.me/2347037850121?text=${encodedText}`;
+      whatsappLinkModal.href = `https://wa.me/2347037850121?text=${encodedText}`;
+    }
+    
+    // Remove item from cart
+    function removeFromCart(itemName) {
+      const index = cart.findIndex(item => item.name === itemName);
+      if (index !== -1) {
+        cart.splice(index, 1);
+        updateCart();
+        showToast(`${itemName} removed from cart`);
+      }
+    }
+    
+    // Clear cart
+    function clearCart() {
+      if (cart.length > 0 && confirm('Are you sure you want to clear your cart?')) {
+        cart = [];
+        updateCart();
+        showToast('Cart cleared');
+      }
+    }
+    
+    function continueAfterDetails() {
+      const name = document.getElementById('cust-name')?.value?.trim();
+      const phone = document.getElementById('cust-phone')?.value?.trim();
+      const email = document.getElementById('cust-email')?.value?.trim();
+      const address = document.getElementById('cust-address')?.value?.trim();
+      if (!name || !phone || !address || !email || !email.includes('@')) {
+        showToast('Enter name, phone, address and a valid email');
+        return;
+      }
+      localStorage.setItem('pg_delivery_details', JSON.stringify({
+        name,
+        phone,
+        email,
+        address,
+        city: document.getElementById('cust-city')?.value?.trim() || '',
+        landmark: document.getElementById('cust-landmark')?.value?.trim() || '',
+        notes: document.getElementById('cust-notes')?.value?.trim() || ''
+      }));
+      showToast('Details saved');
+      payWithPaystack();
+    }
+
+    // Toggle cart modal
+    function toggleCart() {
+      const modal = document.getElementById('cart-modal');
+      modal.classList.toggle('hidden');
+    }
+    
+    // Show toast notification
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Calculate total amount
+    function calculateTotalAmount() {
+      return cart.reduce((total, item) => total + item.price, 0);
+    }
+    
+    // Pay with Paystack
+    function payWithPaystack() {
+      const totalAmount = calculateTotalAmount();
+      
+      if (totalAmount === 0) {
+        showToast('Your cart is empty');
+        return;
+      }
+      
+      const name = document.getElementById('cust-name')?.value?.trim();
+      const phone = document.getElementById('cust-phone')?.value?.trim();
+      const email = document.getElementById('cust-email')?.value?.trim();
+      const address = document.getElementById('cust-address')?.value?.trim();
+      const city = document.getElementById('cust-city')?.value?.trim();
+      const landmark = document.getElementById('cust-landmark')?.value?.trim();
+      const notes = document.getElementById('cust-notes')?.value?.trim();
+      if (!name || !phone || !address || !email || !email.includes('@')) {
+        showToast('Enter name, phone, address and a valid email');
+        return;
+      }
+      
+      const handler = PaystackPop.setup({
+        key: 'pk_live_4e6a5647274184d281e3afa5952cabb2241de3a1',
+        email: email,
+        amount: totalAmount * 100,
+        currency: 'NGN',
+        ref: 'PGR' + Math.floor(Math.random() * 1000000000 + 1),
+        metadata: {
+          custom_fields: [
+            { display_name: 'Customer Name', variable_name: 'customer_name', value: name },
+            { display_name: 'Phone', variable_name: 'phone', value: phone },
+            { display_name: 'Address', variable_name: 'address', value: address },
+            { display_name: 'City', variable_name: 'city', value: city },
+            { display_name: 'Landmark', variable_name: 'landmark', value: landmark },
+            { display_name: 'Notes', variable_name: 'notes', value: notes }
+          ]
+        },
+        callback: function(response) {
+          showToast('Payment successful! Reference: ' + response.reference);
+          // In a real app, you would verify the payment on your server
+          // and then clear the cart or mark the order as paid
+          setTimeout(() => {
+            cart = [];
+            updateCart();
+            toggleCart();
+          }, 2000);
+        },
+        onClose: function() {
+          showToast('Payment cancelled');
+        }
+      });
+      
+      handler.openIframe();
+    }
+    
+    // Handle back button for mobile
+    window.addEventListener('popstate', function() {
+      if (!document.getElementById('cart-modal').classList.contains('hidden')) {
+        toggleCart();
+        history.pushState(null, null, window.location.pathname);
+      }
+    });
+    
+    // Initialize history state
+    history.pushState(null, null, window.location.pathname);
+  </script>
+</body>
+</html>
+      if (inlineBtn) {
+        inlineBtn.addEventListener('click', () => {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(() => {
+              deferredPrompt = null;
+              window.deferredPrompt = null;
+            });
+          } else {
+            const pwaBanner = document.getElementById('pwa-banner');
+            if (pwaBanner) pwaBanner.classList.add('show');
+            alert('Install is unavailable here. On Chrome: Menu → Install App. On Safari/iOS: Share → Add to Home Screen.');
+          }
+        });
+      }
