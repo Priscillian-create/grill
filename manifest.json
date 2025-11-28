@@ -8,14 +8,14 @@
   "theme_color": "#F97316",
   "icons": [
     {
-      "src": "https://bookwithrimrockhotel.com/wp-content/uploads/2024/03/Egusi-3.jpg",
+      "src": "https://unpkg.com/pwacompat@2.0.17/assets/icon_192.png",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/png"
     },
     {
-      "src": "https://bookwithrimrockhotel.com/wp-content/uploads/2024/03/Egusi-3.jpg",
+      "src": "https://unpkg.com/pwacompat@2.0.17/assets/icon_512.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png"
     }
   ],
   "categories": ["food", "restaurant", "delivery"],
