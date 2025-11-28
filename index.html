@@ -11,10 +11,32 @@
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json" />
   
-  <!-- Apple Touch Icon -->
-  <link rel="apple-touch-icon" href="https://unpkg.com/pwacompat@2.0.17/assets/icon_192.png" />
+  <!-- App Icons -->
+  <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+F8E0AAAAASUVORK5CYII=" />
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+F8E0AAAAASUVORK5CYII=" />
   
   <title>Pa Gerry's Grill</title>
+  <script>
+    (function(){
+      const _warn = console.warn;
+      const _error = console.error;
+      console.warn = function(){
+        const msg = arguments[0];
+        if (msg && typeof msg === 'string') {
+          if (msg.includes('cdn.tailwindcss.com should not be used in production')) return;
+          if (msg.includes('Datadog Browser SDK: No storage available for session')) return;
+        }
+        return _warn.apply(console, arguments);
+      };
+      console.error = function(){
+        const msg = arguments[0];
+        if (msg && typeof msg === 'string') {
+          if (msg.includes('Datadog Browser SDK: No storage available for session')) return;
+        }
+        return _error.apply(console, arguments);
+      };
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://js.paystack.co/v1/inline.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1015,39 +1037,44 @@
     
     // Setup PWA install button
     function setupInstallButton() {
-      let deferredPrompt;
       const pwaBanner = document.getElementById('pwa-banner');
       const pwaInstallButton = document.getElementById('pwa-install-button');
       const pwaDismissButton = document.getElementById('pwa-dismiss-button');
       const inlineBtn = document.getElementById('install-inline-btn');
-      
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        window.deferredPrompt = e;
-        pwaBanner.classList.add('show');
-      });
-      
-      pwaInstallButton.addEventListener('click', () => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          deferredPrompt.userChoice.then(() => {
-            deferredPrompt = null;
+
+      const triggerInstall = () => {
+        const promptEvent = window.deferredPrompt;
+        if (promptEvent) {
+          promptEvent.prompt();
+          promptEvent.userChoice.then(() => {
             window.deferredPrompt = null;
           });
+        } else {
+          if (pwaBanner) pwaBanner.classList.add('show');
+          alert('Install is unavailable here. On Chrome: Menu → Install App. On Safari/iOS: Share → Add to Home Screen.');
         }
-        pwaBanner.classList.remove('show');
-      });
-      
-      pwaDismissButton.addEventListener('click', () => {
-        // Hide the banner
-        pwaBanner.classList.remove('show');
-      });
-      
-      // Handle app installed event
+      };
+
+      if (pwaInstallButton) {
+        pwaInstallButton.addEventListener('click', () => {
+          triggerInstall();
+          pwaBanner.classList.remove('show');
+        });
+      }
+
+      if (inlineBtn) {
+        inlineBtn.addEventListener('click', () => {
+          triggerInstall();
+        });
+      }
+
+      if (pwaDismissButton) {
+        pwaDismissButton.addEventListener('click', () => {
+          pwaBanner.classList.remove('show');
+        });
+      }
+
       window.addEventListener('appinstalled', () => {
-        console.log('PWA was installed');
-        // Hide the banner if it exists
         pwaBanner.classList.remove('show');
       });
     }
@@ -1390,18 +1417,3 @@
   </script>
 </body>
 </html>
-      if (inlineBtn) {
-        inlineBtn.addEventListener('click', () => {
-          if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(() => {
-              deferredPrompt = null;
-              window.deferredPrompt = null;
-            });
-          } else {
-            const pwaBanner = document.getElementById('pwa-banner');
-            if (pwaBanner) pwaBanner.classList.add('show');
-            alert('Install is unavailable here. On Chrome: Menu → Install App. On Safari/iOS: Share → Add to Home Screen.');
-          }
-        });
-      }
